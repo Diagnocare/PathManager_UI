@@ -1,0 +1,31 @@
+<div class="license-card">
+  <div class="row">
+    <span class="label">License key</span>
+    <span class="value key">{{ maskedKey(license().licenseKey) }}</span>
+    <button class="secondary tiny" (click)="toggleReveal()">
+      {{ revealed() ? 'Hide' : 'Reveal' }}
+    </button>
+  </div>
+  <div class="row">
+    <span class="label">Type</span>
+    <span class="value">{{ license().licenseType }}</span>
+  </div>
+  <div class="row">
+    <span class="label">Issued</span>
+    <span class="value">{{ license().issuedDate | date: 'dd MMM yyyy' }}</span>
+  </div>
+  <div class="row">
+    <span class="label">Expires</span>
+    <span class="value">{{ license().expiryDate | date: 'dd MMM yyyy' }}</span>
+  </div>
+  <div class="row">
+    <span class="label">Status</span>
+    <span class="badge" [class]="statusClass(license().status)">{{ license().status }}</span>
+  </div>
+  <div class="row">
+    <span class="label">Days remaining</span>
+    <span class="value" [class.danger]="license().isExpired">
+      {{ license().isExpired ? 'Expired' : license().daysRemaining }}
+    </span>
+  </div>
+</div>

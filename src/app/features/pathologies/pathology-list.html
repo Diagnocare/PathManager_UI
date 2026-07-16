@@ -1,0 +1,53 @@
+<div class="list-header">
+  <h1>Find a pathology</h1>
+</div>
+
+<form (ngSubmit)="onSearch()" #f="ngForm" class="search-form">
+  <div class="grid">
+    <label class="field">
+      <span>Path ID</span>
+      <input name="pathId" [(ngModel)]="searchModel.pathId" placeholder="e.g. PATH-0042" />
+    </label>
+    <label class="field">
+      <span>Name</span>
+      <input name="name" [(ngModel)]="searchModel.name" placeholder="e.g. Sunrise Diagnostics" />
+    </label>
+  </div>
+
+  <div class="actions">
+    <button type="submit" [disabled]="loading()">{{ loading() ? 'Searching…' : 'Search' }}</button>
+    <button type="button" class="secondary" (click)="onReset(f)">Reset</button>
+  </div>
+</form>
+
+@if (validationMsg()) {
+  <p class="msg error">{{ validationMsg() }}</p>
+}
+
+@if (error()) {
+  <div class="alert error">
+    {{ error() }}
+    <button class="secondary" (click)="onSearch()">Retry</button>
+  </div>
+}
+
+@if (loading()) {
+  <p class="muted">Searching…</p>
+} @else if (searched()) {
+  @if (results().length === 0) {
+    <p class="muted">No pathologies matched your search.</p>
+  } @else {
+    <ul class="cards">
+      @for (p of results(); track p.id) {
+        <li class="card">
+          <a [routerLink]="['/pathologies', p.id]" class="card-title">{{ p.name }}</a>
+          <div class="meta">
+            <span class="pathid">{{ p.pathId }}</span>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+} @else {
+  <p class="muted">Enter a Path ID, name, or other detail above, then click Search.</p>
+}

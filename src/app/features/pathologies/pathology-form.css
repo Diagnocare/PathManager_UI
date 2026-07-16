@@ -1,0 +1,25 @@
+h1 { margin: 8px 0 16px; }
+.muted { color: var(--muted); }
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.field { display: grid; gap: 4px; font-size: 14px; color: var(--muted); }
+.field.wide { grid-column: 1 / -1; }
+.field input, .field select { width: 100%; }
+
+.actions {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.cancel { color: var(--muted); }
+.msg { margin: 14px 0 0; font-size: 14px; }
+.msg.error { color: var(--danger); }
+
+@media (max-width: 640px) {
+  .grid { grid-template-columns: 1fr; }
+}

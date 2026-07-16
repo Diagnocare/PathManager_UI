@@ -1,0 +1,66 @@
+<p><a routerLink="/pathologies">← Back to search</a></p>
+
+@if (loading()) {
+  <p class="muted">Loading…</p>
+} @else if (error()) {
+  <div class="alert error">
+    {{ error() }}
+    <button class="secondary" (click)="loadDetails()">Retry</button>
+  </div>
+} @else if (pathology(); as p) {
+  <div class="detail-header">
+    <h1>{{ p.name }}</h1>
+    <a [routerLink]="['/pathologies', p.id, 'edit']" class="edit-link">Edit details</a>
+  </div>
+  @if (fromCache()) {
+    <p class="cache-hint muted">Showing cached details · refreshing…</p>
+  }
+  <dl class="fields">
+    <dt>Path ID</dt><dd class="mono">{{ p.pathId }}</dd>
+    <dt>Branch</dt><dd>{{ p.branch || '—' }}</dd>
+    <dt>Address</dt>
+    <dd>{{ formatAddress(p) }}</dd>
+    <dt>Contact</dt><dd>{{ p.contactNo || '—' }}</dd>
+    <dt>Email</dt><dd>{{ p.email || '—' }}</dd>
+  </dl>
+
+  <section class="block">
+    <h2>License</h2>
+    @if (p.license; as summary) {
+      <div class="summary">
+        <span class="badge type">{{ summary.licenseType }}</span>
+        <span class="badge" [class]="summary.status.toLowerCase()">{{ summary.status }}</span>
+        <span class="muted">
+          Expires {{ summary.expiryDate.slice(0, 10) }}
+          @if (summary.isExpired) { <strong class="danger">(expired)</strong> }
+          @else { · {{ summary.daysRemaining }} days left }
+        </span>
+      </div>
+    } @else {
+      <p class="muted">No license on record.</p>
+    }
+
+    @if (history().length > 1) {
+      <details class="history">
+        <summary>License history ({{ history().length }})</summary>
+        <ul>
+          @for (h of history(); track h.id) {
+            <li>
+              <span class="badge type">{{ h.licenseType }}</span>
+              <span class="badge" [class]="h.status.toLowerCase()">{{ h.status }}</span>
+              <span class="muted">{{ h.issuedDate.slice(0, 10) }} → {{ h.expiryDate.slice(0, 10) }}</span>
+            </li>
+          }
+        </ul>
+      </details>
+    }
+
+    @if (!license()) {
+      <button class="secondary" (click)="loadLicense()">View full license (key)</button>
+      @if (licenseError()) { <p class="msg error">{{ licenseError() }}</p> }
+    } @else {
+      <app-license-view [license]="license()!" />
+      <app-extend-license [licenseId]="license()!.id" (extended)="onExtended($event)" />
+    }
+  </section>
+}

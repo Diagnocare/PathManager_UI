@@ -1,0 +1,72 @@
+<p><a routerLink="/pathologies">← Back to search</a></p>
+
+<h1>{{ isEdit ? 'Edit pathology' : 'New pathology' }}</h1>
+
+@if (loading()) {
+  <p class="muted">Loading…</p>
+} @else {
+  <form (ngSubmit)="save()" #f="ngForm" class="form">
+    <div class="grid">
+      <label class="field">
+        <span>Name *</span>
+        <input name="name" required [(ngModel)]="model.name" />
+      </label>
+      <label class="field">
+        <span>Branch</span>
+        <input name="branch" [(ngModel)]="model.branch" />
+      </label>
+      <label class="field">
+        <span>Address line 1</span>
+        <input name="address1" [(ngModel)]="model.address1" />
+      </label>
+      <label class="field">
+        <span>Address line 2</span>
+        <input name="address2" [(ngModel)]="model.address2" />
+      </label>
+      <label class="field">
+        <span>City</span>
+        <input name="city" [(ngModel)]="model.city" />
+      </label>
+      <label class="field">
+        <span>State</span>
+        <input name="state" [(ngModel)]="model.state" />
+      </label>
+      <label class="field">
+        <span>Country</span>
+        <input name="country" [(ngModel)]="model.country" />
+      </label>
+      <label class="field">
+        <span>Pincode</span>
+        <input name="pincode" [(ngModel)]="model.pincode" />
+      </label>
+      <label class="field">
+        <span>Contact no.</span>
+        <input name="contactNo" [(ngModel)]="model.contactNo" />
+      </label>
+      <label class="field">
+        <span>Email</span>
+        <input name="email" type="email" [(ngModel)]="model.email" />
+      </label>
+
+      @if (!isEdit) {
+        <label class="field">
+          <span>License type *</span>
+          <select name="licenseType" [(ngModel)]="licenseType">
+            <option value="Trial">Trial (15 days)</option>
+            <option value="Full">Full (365 days)</option>
+            <option value="Standard">Standard (365 days)</option>
+          </select>
+        </label>
+      }
+    </div>
+
+    @if (error()) { <p class="msg error">{{ error() }}</p> }
+
+    <div class="actions">
+      <button type="submit" [disabled]="saving() || f.invalid">
+        {{ saving() ? 'Saving…' : (isEdit ? 'Save changes' : 'Create pathology') }}
+      </button>
+      <a routerLink="/pathologies" class="cancel">Cancel</a>
+    </div>
+  </form>
+}

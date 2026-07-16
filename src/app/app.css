@@ -1,0 +1,15 @@
+.topbar {
+  background: #0f172a;
+  padding: 14px 24px;
+}
+.brand {
+  color: #fff;
+  font-weight: 700;
+  font-size: 18px;
+}
+.brand:hover { text-decoration: none; }
+.content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+}

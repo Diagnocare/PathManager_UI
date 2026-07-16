@@ -1,0 +1,16 @@
+.extend {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  background: var(--card);
+  display: grid;
+  gap: 12px;
+  max-width: 360px;
+}
+.extend h3 { margin: 0; font-size: 16px; }
+.mode-toggle { display: flex; gap: 8px; }
+.field { display: grid; gap: 4px; font-size: 14px; color: var(--muted); }
+.field input { max-width: 200px; }
+.msg { margin: 0; font-size: 14px; }
+.msg.error { color: var(--danger); }
+.msg.success { color: var(--success); }

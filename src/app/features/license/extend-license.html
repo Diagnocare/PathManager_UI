@@ -1,0 +1,42 @@
+<div class="extend">
+  <h3>Extend license</h3>
+
+  <div class="mode-toggle">
+    <button
+      [class.secondary]="mode() !== 'months'"
+      (click)="setMode('months')">By months</button>
+    <button
+      [class.secondary]="mode() !== 'date'"
+      (click)="setMode('date')">To a date</button>
+  </div>
+
+  @if (mode() === 'months') {
+    <label class="field">
+      <span>Months to add</span>
+      <input type="number" min="1" max="120"
+             [ngModel]="months()" (ngModelChange)="months.set($event)" />
+    </label>
+  } @else {
+    <label class="field">
+      <span>New expiry date</span>
+      <input type="date"
+             [ngModel]="newExpiryDate()" (ngModelChange)="newExpiryDate.set($event)" />
+    </label>
+  }
+
+  <label class="field">
+    <span>License type</span>
+    <select [ngModel]="licenseType()" (ngModelChange)="licenseType.set($event)">
+      <option value="Trial">Trial</option>
+      <option value="Full">Full</option>
+      <option value="Standard">Standard</option>
+    </select>
+  </label>
+
+  <button (click)="submit()" [disabled]="submitting()">
+    {{ submitting() ? 'Extending…' : 'Extend (issues a new license)' }}
+  </button>
+
+  @if (error()) { <p class="msg error">{{ error() }}</p> }
+  @if (success()) { <p class="msg success">{{ success() }}</p> }
+</div>
