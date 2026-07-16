@@ -2,5 +2,5 @@
 export const environment = {
   production: false,
   name: 'uat',
-  apiBaseUrl: 'https://uat-api.pathologymanager.example.com',
+  apiBaseUrl: 'https://diagnocare-pathmanager-uat.runasp.net',
 };
