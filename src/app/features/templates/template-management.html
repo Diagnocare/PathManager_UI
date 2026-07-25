@@ -1,0 +1,178 @@
+<div class="page-container">
+
+  <!-- Global loading overlay: blocks the UI while a backend request is in flight -->
+  @if (busy) {
+    <div class="loading-overlay">
+      <div class="loading-box">
+        <span class="spinner"></span>
+        <span class="loading-text">Working…</span>
+      </div>
+    </div>
+  }
+
+  <div class="page-header">
+    <div class="header-left">
+      <h1>Report Template Designer</h1>
+      <p class="subtitle">Design a lab's report HTML &amp; CSS, preview live, then push to its database.</p>
+    </div>
+  </div>
+
+  @if (statusMsg) { <div class="alert info">{{ statusMsg }}</div> }
+  @if (errorMsg) { <div class="alert error">{{ errorMsg }}</div> }
+  @if (unknownTokens.length) { <div class="alert error">Unknown tokens: {{ unknownTokens.join(', ') }}</div> }
+
+  <!-- ── Lab selection ─────────────────────────────────────────────── -->
+  @if (!selectedLab) {
+    <div class="card lab-select">
+      <form class="lab-search" (ngSubmit)="onSearch()">
+        <label><span>Path ID</span>
+          <input type="text" name="pathId" [(ngModel)]="searchModel.pathId" placeholder="e.g. Path1007" />
+        </label>
+        <label><span>Name</span>
+          <input type="text" name="name" [(ngModel)]="searchModel.name" placeholder="Lab name" />
+        </label>
+        <button type="submit" class="btn btn-primary" [disabled]="busy">
+          <span *ngIf="busy" class="spinner spinner--sm"></span>Search
+        </button>
+      </form>
+
+      @if (searched()) {
+        @if (results().length === 0) {
+          <p class="muted">No pathologies matched your search.</p>
+        } @else {
+          <ul class="result-list">
+            @for (lab of results(); track lab.id) {
+              <li>
+                <span><strong>{{ lab.name }}</strong> <span class="ver">{{ lab.pathId }}</span></span>
+                <button type="button" class="btn btn-secondary btn-sm" (click)="selectLab(lab)" [disabled]="busy">Open designer</button>
+              </li>
+            }
+          </ul>
+        }
+      }
+    </div>
+  }
+
+  <!-- ── Designer ──────────────────────────────────────────────────── -->
+  @if (selectedLab) {
+    <div class="content-container designer-root">
+
+      <div class="selected-bar">
+        <span>Lab: <strong>{{ selectedLab.name }}</strong> ({{ selectedLab.pathId }})</span>
+        <button type="button" class="btn btn-secondary btn-sm" (click)="clearLab()">Change lab</button>
+      </div>
+
+      <!-- Meta bar -->
+      <div class="meta-bar card">
+        <div class="meta-group">
+          <label class="meta-label">Load Existing Template</label>
+          <div class="meta-row">
+            <select class="form-select meta-select" [(ngModel)]="selectedLoadId" [disabled]="loadingTemplates">
+              <option [ngValue]="null" disabled>-- select to load --</option>
+              <option *ngFor="let t of existingTemplates" [ngValue]="t.templateId">
+                {{ t.templateName }}{{ t.isActive ? ' (active)' : '' }}
+              </option>
+            </select>
+            <button class="btn btn-secondary btn-sm" (click)="onLoadSelected()" [disabled]="!selectedLoadId || busy">Load</button>
+            <button class="btn btn-secondary btn-sm" (click)="newTemplate()" [disabled]="busy">New</button>
+          </div>
+        </div>
+
+        <div class="meta-divider"></div>
+
+        <div class="meta-group meta-group--info">
+          <div class="meta-field">
+            <label class="meta-label">Template Name <span class="req">*</span></label>
+            <input class="form-control meta-input" [(ngModel)]="templateName" (ngModelChange)="onContentChange()"
+                   placeholder="e.g. CBC Standard Report" />
+          </div>
+          <div class="meta-field meta-field--wide">
+            <label class="meta-label">Description</label>
+            <input class="form-control meta-input" [(ngModel)]="description" (ngModelChange)="onContentChange()"
+                   placeholder="Short description (optional)" />
+          </div>
+        </div>
+
+        <div class="meta-divider"></div>
+
+        <div class="meta-group meta-group--actions">
+          <button class="btn btn-primary" (click)="refreshPreview()">Preview</button>
+          <button class="btn btn-primary" (click)="save()" [disabled]="busy || !isDirty">
+            <span *ngIf="isSaving" class="spinner spinner--sm"></span>
+            <span *ngIf="!isSaving">{{ templateId ? 'Push update' : 'Create & push' }}</span>
+            <span *ngIf="isSaving">Pushing…</span>
+          </button>
+          <button class="btn btn-secondary" (click)="setActiveLoaded()" [disabled]="!templateId || busy">Set active</button>
+          <span class="saved-badge" *ngIf="isSaved && !isDirty">Saved</span>
+          <span class="dirty-badge" *ngIf="isDirty">Unsaved changes</span>
+        </div>
+      </div>
+
+      <!-- Split pane -->
+      <div class="designer-split">
+
+        <div class="editor-pane card">
+          <div class="editor-tabs">
+            <button class="editor-tab" [class.active]="activeTab === 'html'" (click)="activeTab = 'html'">HTML</button>
+            <button class="editor-tab" [class.active]="activeTab === 'css'" (click)="activeTab = 'css'">CSS</button>
+            <button class="editor-tab placeholder-toggle" [class.active]="showPlaceholders"
+                    (click)="showPlaceholders = !showPlaceholders">Placeholders</button>
+          </div>
+
+          <div class="placeholder-panel" *ngIf="showPlaceholders">
+            <p class="placeholder-hint">Click a token to insert it into the active editor (HTML or CSS).</p>
+            <div *ngFor="let cat of placeholderCategories" class="placeholder-category">
+              <div class="placeholder-category-label">{{ cat }}</div>
+              <div class="placeholder-chips">
+                <button *ngFor="let ph of placeholdersByCategory(cat)" class="placeholder-chip"
+                        [title]="ph.description" (click)="insertPlaceholder(ph.token)">{{ ph.token }}</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="editor-body" *ngIf="activeTab === 'html'">
+            <textarea #htmlTextarea class="code-editor" [(ngModel)]="htmlBody" (ngModelChange)="onContentChange()"
+                      spellcheck="false" autocomplete="off" placeholder="HTML report template…"></textarea>
+          </div>
+          <div class="editor-body" *ngIf="activeTab === 'css'">
+            <textarea #cssTextarea class="code-editor" [(ngModel)]="cssStyles" (ngModelChange)="onContentChange()"
+                      spellcheck="false" autocomplete="off" placeholder="CSS styles…"></textarea>
+          </div>
+        </div>
+
+        <div class="preview-pane card">
+          <div class="preview-pane-header">
+            <span class="preview-label">Preview</span>
+            <div class="preview-header-actions">
+              <label class="auto-preview-toggle">
+                <input type="checkbox" [(ngModel)]="autoPreview" />
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                <span class="toggle-label">{{ autoPreview ? 'Live' : 'Manual' }}</span>
+              </label>
+              <button class="btn btn-secondary btn-sm" (click)="refreshPreview()">Refresh</button>
+            </div>
+          </div>
+          <div class="preview-frame-wrap">
+            <iframe #previewFrame class="preview-frame" title="Template Preview" sandbox="allow-same-origin"></iframe>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="ref-card card" *ngIf="showPlaceholders">
+        <div class="ref-header"><h3>Placeholder Reference</h3></div>
+        <table class="ref-table">
+          <thead><tr><th>Category</th><th>Token</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let ph of placeholders">
+              <td><span class="ref-category">{{ ph.category }}</span></td>
+              <td><code class="ref-token">{{ ph.token }}</code></td>
+              <td>{{ ph.description }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  }
+</div>

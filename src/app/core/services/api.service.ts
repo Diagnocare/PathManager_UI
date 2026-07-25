@@ -12,6 +12,16 @@ import {
   PathologyCreateRequest,
   PathologyUpdateRequest,
 } from '../models/pathology.models';
+import {
+  LabPicker,
+  LabTemplate,
+  CreateTemplateRequest,
+  PushTemplateRequest,
+  PreviewTemplateRequest,
+  PreviewTemplateResponse,
+  TemplateTokens,
+  TemplateAudit,
+} from '../models/template.models';
 
 /** Single typed gateway to the Pathology Manager API. */
 @Injectable({ providedIn: 'root' })
@@ -59,5 +69,60 @@ export class ApiService {
   /** Extend a license by months or to an explicit date; returns the updated license. */
   extendLicense(licenseId: number, body: ExtendLicenseRequest): Observable<License> {
     return this.http.post<License>(`${this.base}/api/licenses/${licenseId}/extend`, body);
+  }
+
+  // ── Centralized template management (super admin) ─────────────────────────────
+
+  /** Lists every lab for the admin template picker. */
+  listLabs(): Observable<LabPicker[]> {
+    return this.http.get<LabPicker[]>(`${this.base}/api/admin/labs`);
+  }
+
+  /** All available report templates for a lab. */
+  getLabTemplates(pathologyId: number): Observable<LabTemplate[]> {
+    return this.http.get<LabTemplate[]>(`${this.base}/api/admin/labs/${pathologyId}/templates`);
+  }
+
+  /** A single template (full HTML/CSS) for a lab. */
+  getLabTemplate(pathologyId: number, templateId: number): Observable<LabTemplate> {
+    return this.http.get<LabTemplate>(
+      `${this.base}/api/admin/labs/${pathologyId}/templates/${templateId}`,
+    );
+  }
+
+  /** Allowed placeholder tokens for report templates. */
+  getTemplateTokens(): Observable<TemplateTokens> {
+    return this.http.get<TemplateTokens>(`${this.base}/api/admin/templates/tokens`);
+  }
+
+  /** Renders a preview with sample data. */
+  previewTemplate(body: PreviewTemplateRequest): Observable<PreviewTemplateResponse> {
+    return this.http.post<PreviewTemplateResponse>(`${this.base}/api/admin/templates/preview`, body);
+  }
+
+  /** Creates a new template in the lab DB. */
+  createTemplate(pathologyId: number, body: CreateTemplateRequest): Observable<LabTemplate> {
+    return this.http.post<LabTemplate>(`${this.base}/api/admin/labs/${pathologyId}/templates`, body);
+  }
+
+  /** Pushes edited template content into the lab DB. */
+  pushTemplate(pathologyId: number, body: PushTemplateRequest): Observable<LabTemplate> {
+    return this.http.post<LabTemplate>(
+      `${this.base}/api/admin/labs/${pathologyId}/templates/push`,
+      body,
+    );
+  }
+
+  /** Sets which template is active for a lab. */
+  setActiveTemplate(pathologyId: number, templateId: number): Observable<LabTemplate> {
+    return this.http.post<LabTemplate>(
+      `${this.base}/api/admin/labs/${pathologyId}/templates/${templateId}/activate`,
+      {},
+    );
+  }
+
+  /** Template change audit history for a lab. */
+  getTemplateAudit(pathologyId: number): Observable<TemplateAudit[]> {
+    return this.http.get<TemplateAudit[]>(`${this.base}/api/admin/labs/${pathologyId}/templates/audit`);
   }
 }

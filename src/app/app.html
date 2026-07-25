@@ -1,5 +1,14 @@
 <header class="topbar">
   <a routerLink="/pathologies" class="brand">🔬 Pathology Manager</a>
+
+  @if (auth.isAuthenticated()) {
+    <nav class="topnav">
+      <a routerLink="/pathologies" routerLinkActive="active">Pathologies</a>
+      <a routerLink="/templates" routerLinkActive="active">Templates</a>
+      <span class="who">{{ auth.username() }}</span>
+      <button type="button" class="logout" (click)="logout()">Sign out</button>
+    </nav>
+  }
 </header>
 
 <main class="content">

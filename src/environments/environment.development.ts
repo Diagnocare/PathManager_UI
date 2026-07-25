@@ -2,5 +2,6 @@
 export const environment = {
   production: false,
   name: 'dev',
-  apiBaseUrl: 'http://diagnocarepathmanagerdevapi:84',
+  // apiBaseUrl: 'http://diagnocarepathmanagerdevapi',
+  apiBaseUrl:'https://localhost:7080'
 };

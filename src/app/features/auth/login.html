@@ -1,0 +1,38 @@
+<div class="login-wrap">
+  <form class="login-card" (ngSubmit)="onSubmit()" #f="ngForm">
+    <h1>Pathology Manager</h1>
+    <p class="subtitle">Super admin sign-in</p>
+
+    @if (error()) {
+      <div class="alert">{{ error() }}</div>
+    }
+
+    <label>
+      <span>Username</span>
+      <input
+        type="text"
+        name="username"
+        autocomplete="username"
+        [(ngModel)]="model.username"
+        [disabled]="loading()"
+        required
+      />
+    </label>
+
+    <label>
+      <span>Password</span>
+      <input
+        type="password"
+        name="password"
+        autocomplete="current-password"
+        [(ngModel)]="model.password"
+        [disabled]="loading()"
+        required
+      />
+    </label>
+
+    <button type="submit" [disabled]="loading()">
+      {{ loading() ? 'Signing in…' : 'Sign in' }}
+    </button>
+  </form>
+</div>
