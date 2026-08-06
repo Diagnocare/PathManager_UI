@@ -1,0 +1,11 @@
+node_modules
+dist
+.angular
+.git
+.github
+.vs
+.vscode
+.azure-pipelines
+*.log
+Dockerfile
+.dockerignore

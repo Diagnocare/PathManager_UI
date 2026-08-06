@@ -19,8 +19,8 @@ type Mode = 'months' | 'date';
 export class ExtendLicense {
   private readonly api = inject(ApiService);
 
-  /** License id to extend. */
-  readonly licenseId = input.required<number>();
+  /** Path id (pathology id) whose current license is extended. */
+  readonly pathId = input.required<number>();
   /** Emitted with the updated license on success. */
   readonly extended = output<License>();
 
@@ -53,7 +53,7 @@ export class ExtendLicense {
     }
 
     this.submitting.set(true);
-    this.api.extendLicense(this.licenseId(), body).subscribe({
+    this.api.extendLicense(this.pathId(), body).subscribe({
       next: (updated) => {
         this.submitting.set(false);
         this.success.set(`Extended to ${updated.expiryDate.slice(0, 10)}.`);

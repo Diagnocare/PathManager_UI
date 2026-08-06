@@ -60,7 +60,7 @@
       @if (licenseError()) { <p class="msg error">{{ licenseError() }}</p> }
     } @else {
       <app-license-view [license]="license()!" />
-      <app-extend-license [licenseId]="license()!.id" (extended)="onExtended($event)" />
+      <app-extend-license [pathId]="p.id" (extended)="onExtended($event)" />
     }
   </section>
 }

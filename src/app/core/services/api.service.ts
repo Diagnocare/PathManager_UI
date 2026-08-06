@@ -66,9 +66,10 @@ export class ApiService {
     return this.http.get<LicenseSummary[]>(`${this.base}/api/pathologies/${pathologyId}/licenses`);
   }
 
-  /** Extend a license by months or to an explicit date; returns the updated license. */
-  extendLicense(licenseId: number, body: ExtendLicenseRequest): Observable<License> {
-    return this.http.post<License>(`${this.base}/api/licenses/${licenseId}/extend`, body);
+  /** Extend the current license of a pathology (by its path id) by months or to an
+   * explicit date; returns the newly issued license. */
+  extendLicense(pathId: number, body: ExtendLicenseRequest): Observable<License> {
+    return this.http.post<License>(`${this.base}/api/licenses/${pathId}/extend`, body);
   }
 
   // ── Centralized template management (super admin) ─────────────────────────────
