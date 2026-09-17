@@ -1,7 +1,6 @@
-/** DEVELOPMENT environment — points at the local ASP.NET Core API (Development). */
+/** PRODUCTION environment — points at the production ASP.NET Core API. */
 export const environment = {
-  production: false,
-  name: 'dev',
-  // apiBaseUrl: 'http://diagnocarepathmanagerdevapi',
-  apiBaseUrl:'https://pathmanager.runasp.net/'
+  production: true,
+  name: 'prod',
+  apiBaseUrl: 'https://pathmanager.runasp.net'
 };
